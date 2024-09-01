@@ -1,0 +1,6 @@
+
+We have created a addition program, and wrote some code for unit testing.
+
+We will write a pipeline in github actions. This pipeline, whenever there is a new commit, Github action should create python evn, 
+
+It follows YAML standard.

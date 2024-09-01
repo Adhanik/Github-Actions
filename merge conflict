@@ -1,0 +1,28 @@
+[defaults]
+host_key_checking = False
+hash_behaviour=merge
+
+roles_path = galaxyroles/
+
+[ssh_connection]
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o ForwardAgent=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+pipelining = True
+<<<<<<< burrowconfg
+scp_if_ssh = True
+transport = paramiko
+=======
+scp_if_ssh = True
+>>>>>>> master
+
+
+
+Between the <<<<<<< and =======, you will find the version as per the changes in your current branch, relative to the base commit.
+
+Between the ======= and >>>>>>>, you will find the version according to the other branch, relative to the base commit.
+
+For convenience, after the <<<<<<< and >>>>>>> markers, you will see hints as to which commit that part of the conflict stems from, HEAD of course being the current revision.
+
+To resolve the conflicts, you have to decide what the end result should be. This is not something you can do without thinking, otherwise Git would have done it for you.
+
+
+https://imagej.net/develop/git/conflicts

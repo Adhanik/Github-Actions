@@ -1,0 +1,567 @@
+
+
+
+make serve --to see changes in document
+
+# How to revert a commit that you pushed to remote repo in GIT?
+
+   git log ---Note down the commit hash or identify it by the commit message. get the hash id of the latest commit u made
+   git revert <commit_hash>
+   Resolve Conflicts (if any)
+   Git will prompt you to enter a commit message for the revert commit. - wq!
+   git push origin <branch-name>
+
+
+# git push -u origin gitrepo
+
+This command will push the gitrepo branch from your local repository to the gitrepo branch on your GitHub repository. The -u option sets the upstream branch, so you don't need to explicitly set it with git branch --set-upstream-to.
+
+
+10 Advanced Git Techniques - https://www.kdnuggets.com/10-advanced-git-techniques
+
+# force delete a branch - git branch -D test
+
+# Updates were rejected because the tip of your current branch is behind its remote counterpart
+
+# Sol - git push -f origin FixForBug
+  
+  The -f is actually required because of the rebase. Whenever you do a rebase you would need to do a force push because the remote branch cannot be fast-forwarded to your commit. You'd always want to make sure that you do a pull before pushing, but if you don't like to force push to master or dev for that matter, you can create a new branch to push to and then merge or make a PR.
+
+    https://stackoverflow.com/questions/39399804/updates-were-rejected-because-the-tip-of-your-current-branch-is-behind-its-remot
+
+# Git push rejected "non-fast-forward"
+
+
+  It looks, that someone pushed new commits between your last git fetch and git push. In this case you need to repeat your steps and rebase my_feature_branch one more time.
+
+        git fetch
+        git rebase feature/my_feature_branch
+        git push origin feature/my_feature_branch
+        After the git fetch I recommend to examine situation with gitk --all.
+
+  https://stackoverflow.com/questions/20467179/git-push-rejected-non-fast-forward
+
+GIT 
+# I have created a branch(abc), merged it with master, then i made some changes again in the same branch. I did git stash, checkout master, and did git pull. Now if i do git checkout abc again, and push these changes to remote, is it fine doing so? will it create any problem? is this a good practice?
+
+
+The process you described seems reasonable and generally aligns with common Git workflows. However, it's always good to be cautious and understand the potential impact. Here's a breakdown of the steps you mentioned:
+
+		Created a branch (abc) and made changes:
+      This is a standard practice for working on a new feature or bug fix in a separate branch.
+
+		Merged the branch with master:
+      Merging the branch into master is a common step to incorporate the changes from your feature branch into the main development branch.
+
+		Made additional changes in the same branch (abc):
+        It's okay to continue making changes in the same branch if needed.
+    
+		Stashed changes, checked out master, and pulled:
+      Stashing changes is a good way to temporarily save your work. Checking out master and pulling updates from the remote ensures your local master is up to date.
+		
+    Checked out the abc branch again:
+      Checking out the branch allows you to continue working on it.
+
+		Pushing changes to the remote:
+      It's generally fine to push your changes to the remote branch. However, there are a couple of considerations:
+      If you've made changes in your local branch after pulling from the remote master, there could be conflicts. Ensure you resolve any conflicts before pushing.
+      If this branch is being used by others or if it's part of a shared repository, coordinate with your team to avoid conflicts.
+
+Best Practices:
+
+    Before pushing changes to a shared branch, it's often a good practice to review the changes, especially if you've pulled updates from the remote master.
+    If you're working with others, communicate any significant changes you're pushing to shared branches.
+    Always be mindful of potential conflicts and resolve them before pushing.
+    In summary, while what you described is a common workflow, it's essential to be aware of the state of your branches, especially if they are shared with others. Reviewing changes and coordinating with your team can help prevent issues.
+
+
+# So in this case git makes this abc branch again? since the old one has been merged into master? doesnt git mark branch name as duplicated? 
+
+
+No, Git does not mark branch names as duplicated or "used up" after a branch has been merged into another branch. Git allows you to reuse branch names. When you create a new branch with the same name as an old branch, Git simply creates a new branch with that name, starting from the commit where the branch previously left off.
+
+Here's a breakdown of what happens:
+
+		Create a branch (abc) and make changes.
+        You have a branch named abc pointing to a specific commit.
+		
+    Merge the branch into master.
+        The changes from the abc branch are now part of the master branch.
+		
+    Make additional changes in the same branch (abc).
+        You continue making changes in the abc branch. This could be new commits or modifications to existing ones.
+		
+    Stash changes, check out master, and pull updates.
+        You stash changes in the abc branch, check out master, and pull updates. This ensures that master is up to date.
+		
+    Check out the abc branch again.
+        You check out the abc branch again. Git recreates the branch from where it left off, including any new changes you made after the merge.
+		
+    Push changes to the remote abc branch.
+        You push the changes to the remote abc branch. Git updates the remote abc branch with your new changes.
+
+The branch name abc is not marked as used up or unusable. Git allows you to continue working with the same branch name, creating a new branch based on the previous commit of the branch. This behavior is intentional and part of Git's flexibility in managing branches.
+
+
+# I checked out into branch again using - git checkout abc, but it does not show the changes i saved using git stash. is there command like unstash or something?
+
+
+Yes, you can retrieve the changes you stashed using the git stash apply command. Here's how you can do it:
+
+  bash
+  git stash apply
+
+This command will apply the most recent stash to your current working directory. If you have multiple stashes, you can specify which stash to apply:
+
+  bash
+
+  git stash apply stash@{n}
+
+Replace n with the index of the stash you want to apply. The index starts from 0 for the most recent stash.
+
+Alternatively, if you want to apply and remove the stash in one go, you can use git stash pop:
+
+    bash
+    git stash pop
+
+This command is equivalent to applying the stash and then dropping it. It's useful when you no longer need the changes in the stash.
+
+After applying the stash, you should see the changes in your working directory.
+
+----*****-----
+
+
+# What git pull vs git pull —rebase does? If i have made a file in my branch and i do git pull —rebase, then except for my new file, git will pull all the files but in git pull it will override my new filr as well if it does not exist in master , is this understanding correct?
+
+
+You have a good understanding of the differences between git pull and git pull --rebase, but there is a slight clarification needed: 
+
+before pull command - git branch --set-upstream-to=origin <yourbranch-name>
+then git pull --rebase
+then git push origin Rflavour
+
+see explaination below -->
+
+1. git pull: When you run git pull, Git will fetch the changes from the remote repository and then merge them into your current branch. If you’ve made changes to a file that doesn’t exist in the remote branch (e.g., the master branch), Git will attempt to merge those changes along with the changes from the remote branch. If there are no conflicts, it will create a merge commit. 
+
+2. git pull --rebase: When you run git pull --rebase, Git will fetch the changes from the remote repository and then reapply your local commits on top of the fetched changes. it means your changes on a file remain intact, git has modified that existing file in master by updating the content of that file with your latest code.
+
+
+This can result in a linear commit history because it doesn’t create merge commits. However, if you have changes that conflict with the remote changes, you will need to resolve those conflicts during the rebase process. In both cases, your new file will not be “overridden.” It will be retained as long as you have committed it locally. 
+
+However, in the git pull scenario, if the file doesn’t exist in the remote branch and you’ve made changes to it locally, those changes will be included in the merge commit, which might not be the desired outcome. If you want to keep your new file separate from the merge commit and have a cleaner history, you can consider using git pull --rebase and resolve any conflicts during the rebase process. This way, your new file’s changes will be reapplied on top of the fetched changes, preserving a linear history.
+
+
+if you are working on new system, and you have a branch on remote repo on which you were working, how can you replicate the exact same changes?
+
+     Open GITHUB, Clone the repo
+     after clonig the repo, create a local branch with the same name as remote branch
+     Since this branch has no tracking infor with remote branch, after you have created local branch with same name, 
+           git checkout -b DCS-189625
+           run - git branch --set-upstream-to=origin DCS-189625 
+     now on this branch, run - git pull --no-rebase
+     Enter a msg in vi editor, close using :wq! and now you have the same remote branch in your local again
+
+How to work with GITHUB?
+
+Before creating PR we should pull code from master., LOCAL repo should be updated with REMOTE REPO
+
+ALWAYS DO GIT PULL
+
+  If you have merged a branch with master, that gets deleted in remote, if you push another PR without doing git pull on master, local master will 
+  not have the changes as remote master, and terraform will then destroy the previous resource that u created.
+
+  Hence do git pull on master, then create a new branch and raise PR to avoid any conflicts.
+
+How to work with branches -->
+
+1. Make a new dir in which you will clone the remote repo.
+2. Clone the repo inside that dir, if you need to work on more then one, you can also clone the other one as well.
+3. Create a new branch always first, before making any changes to the local branch. Now make all your changes on this local branch.
+4. Once all changes have been made, add file to stageing area,
+
+      git add .
+
+      if you want to remove a file from stagin area -
+      git restore --staged wiki/persistence/cassandra/oncall_support.md
+
+5. Do commit. 
+6. Do a git pull on master branch before push
+
+xyz@xyz-M-32UH terraform-aws-rds-module % git checkout master
+Switched to branch 'master'
+Your branch is behind 'origin/master' by 73 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+xyz@xyz-M-32UH terraform-aws-rds-module % git pull --rebase
+From sqbu-github.abc.com:xyz/terraform-aws-rds-module
+   74ae70a..483e2bf  master     -> origin/master
+ * [new tag]         1.3.10     -> 1.3.10
+
+Current branch mysql-DCS-185435 is up to date.
+
+7. push this local branch again to remote repo. If you do git status, it will show you only the files that you have made changes to,
+    you dont need to push the whole repo from local to remote. Push only those files which are having changes.
+8. Now you can see if the code is reviewed and approved, you can merge with master branch.
+
+Delete a branch in local - Issue the following command: git branch --delete <branchname> . 
+
+  
+Closing a pull request in remote
+  Under your repository name, click Pull requests.
+  In the "Pull Requests" list, click the pull request you'd like to close.
+  At the bottom of the pull request, below the comment box, click Close pull request.
+  Optionally, delete the branch. This keeps the list of branches in your repository tidy.
+
+Before doing delete, delete branch from remote.(previous steps)
+  If you have made any changes on local branch, it will not allow you to delete without saving them. run GIT STASH to temporarily save chagnes that  your made in your working dir but dont want to commit yet.
+  checkout to master 
+  do git pull --rebase
+  run delete command  - git branch --delete  rdstest-WS-185435
+
+GIT STASH
+
+When we use git stash to temporarily save changes and then switch to a diff branch(like master), the statsh we created is associated with the branch you were on when 
+you used git stash, When you switch back to your original branch, those stashed changes should be still available.
+
+To apply the stashed changes back to your branch, you can use --> git stash apply
+If you want to remove the stash after applying it, you can use git stash drop --> git stash drop
+if you only want to temporarily apply the stash and keep it for later use, you can use --> git stash pop
+
+# Q - I pushed to Github to my remote branch from my local branch, and got some conflicts. How did i resolve them?
+
+  1. I updated the code in Web editor, by removing the code that i did not want and removing these as well >>>>> & <<<<<<<
+  2. Then I merge commit, now my remote branch is ok
+  3. then I went to my local, since i wanted the same code on my local branch as well, i did a get fetch
+
+  xyz@xyz-M-32UH integration % git fetch origin mysqlWspace-DCS-185435
+        From sqbu-github.cisco.com:Persistence/tf-workspace-rds-aws
+        * branch            mysqlWspace-DCS-185435 -> FETCH_HEAD
+        xyz@xyz-M-32UH integration % git status
+        On branch mysqlWspace-DCS-185435
+        Your branch is ahead of 'origin/mysqlWspace-DCS-185435' by 1 commit.
+        (use "git push" to publish your local commits)
+
+        nothing to commit, working tree clean 
+
+  4. After this, i ran command - git reset --hard origin/mysqlWspace-DCS-185435
+
+  xyz@xyz-M-32UH integration % git reset --hard origin/mysqlWspace-DCS-185435
+            HEAD is now at 5adb20d Merge branch 'master' into mysqlWspace-DCS-185435
+            xyz@xyz-M-32UH integration % git status
+            On branch mysqlWspace-DCS-185435
+            Your branch is up to date with 'origin/mysqlWspace-DCS-185435'.
+
+            nothing to commit, working tree clean
+
+   5. Now my local branch is up to date with my remote branch.
+
+
+# Q - Git fetch vs Git Pull
+
+Ans - If you want to update your local branch with the latest changes from the remote branch without merging, you should use git fetch instead of git pull.
+      Git fetch downloads the changes but doesnt automatically merge them, allowing u to inspect and decide how to integrate them
+
+      When we run git pull origin <remote-branch>, git fetches the changes from the specified remote branch and integrates them into your currently checked-out 
+      local branch. To see the changes that were pulled into your local branch, you can use various GIT commands to view the commit history, inspect file diff etc.
+
+      1. View commit history  - git log
+      2. View specific changes - git diff HEAD~1..HEAD (This will show the diff btw current state(HEAD) and the state before the latest commit(HEAD~1)).
+      3. Review individual commits - git log -p
+
+Git pull origin master - what will this do?
+
+
+The command `git pull origin master` is used to fetch changes from the remote repository (origin) and merge them into the currently checked-out branch, typically the local `master` branch in this case. Here's what each part of the command does: - `git pull`: This is a Git command used to fetch and merge changes from a remote repository. - `origin`: This is the default name for the remote repository from which you want to fetch changes. Typically, `origin` refers to the repository from which you originally cloned your local repository. - `master`: This is the name of the branch on the remote repository that you want to fetch and merge into your current local branch. So, when you run `git pull origin master`, Git will: 1. Fetch the latest changes from the `master` branch on the remote repository (`origin`) to your local repository. 2. Merge those changes into your currently checked-out branch (in this case, your local `master` branch). This command is useful when you want to update your local branch with the latest changes from the remote `master` branch. However, it's important to note that if there are any conflicting changes between your local branch and the remote `master` branch, you may encounter merge conflicts that need to be resolved manually.
+
+What is diff in merge and rebase?
+
+
+In Git, both merging and rebasing are methods for integrating changes from one branch into another, but they do so in different ways, resulting in different commit histories. Here's a comparison of the two: **Merge**: 1. **Merge Commit**: When you merge one branch into another (e.g., `git merge feature-branch` into `main`), Git creates a new commit known as a "merge commit" that has two parent commits—the last commit of the current branch and the last commit of the branch being merged. 2. **Preserves Branch History**: Merging preserves the commit history of both branches. You can see when each branch diverged and when the merge occurred. 3. **Simpler Conflict Resolution**: Conflicts, if they occur, are often easier to resolve because Git typically provides clear markers in the conflicted files. 4. **Suitable for Collaborative Workflows**: Merging is often more suitable for collaborative workflows where multiple contributors work on different branches and want to bring their changes into a common branch (e.g., merging feature branches into `main`). **Rebase**: 1. **Linear Commit History**: When you rebase one branch onto another (e.g., `git rebase feature-branch` onto `main`), Git replays the commits from the rebased branch on top of the target branch. This results in a linear commit history with no merge commits. 2. **Rewrites Commit History**: Rebasing rewrites the commit history of the rebased branch. It appears as if the rebased branch's changes were made directly on top of the target branch. 3. **No Merge Commits**: Unlike merging, rebasing doesn't create merge commits, which can lead to a cleaner commit history. 4. **Potential for Conflict**: Rebasing can lead to conflicts if the changes in the rebased branch conflict with changes in the target branch. These conflicts must be resolved during the rebase. 5. **Suitable for a Clean Commit History**: Rebasing is often used to maintain a clean and linear commit history, especially in feature branches. It can make it easier to review and understand the history of a branch. In summary, merging and rebasing serve different purposes. Merging preserves branch history and is suitable for integrating feature branches into a common branch. Rebasing creates a linear commit history and is useful for maintaining a clean history. The choice between the two depends on your project's workflow and your preferences for commit history.
+
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+
+
+
+
+How to remove file in github
+
+    git rm provider.tf
+    git status - deleted:    environments/ascratchg/provider.tf
+    git commit -m "Deleted provider-file"
+    git push
+
+EG -->
+
+xyz@xyz-M-32UH ~ % mkdir RDS_Vault_Integration
+xyz@xyz-M-32UH ~ % cd RDS_Vault_Integration 
+xyz@xyz-M-32UH RDS_Vault_Integration % git clone git@sqbu-github.cisco.com:Persistence/terraform-aws-rds-module.git
+Cloning into 'terraform-aws-rds-module'...
+
+
+How to revert a commit?
+
+To remove the last commit and move branch pointer to the previous commit use - git reset HEAD~1
+iT WILL show the untracked files again.
+
+xyz@xyz-M-32UH integration % git reset HEAD~1
+xyz@xyz-M-32UH integration % git status
+On branch mysqlWspace-DCS-185435
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        mysql-DCS185435.tf
+
+
+git config --global user.email "xyz@cisco.com"
+git config --global user.name "xyz"
+
+
+Comands -
+
+1. git status
+2. git checkout -b DCS-185435  - Switched to a new branch 'DCS-185435' # always create a new branch on local so you push it easily to remote repo
+   git checkout <branch-name>   - Switched to existing branch from master.
+   git log --graph --oneline --decorate --all - See the graph
+3. git status
+        On branch DCS-185435
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   README.md
+4. git add .
+5. git commit -m "rdsinstance"
+6. git push --set-upstream origin DCS-185435
+
+Before u start working on new changes, this should be the msg 
+
+xyz@xyz-M-32UH terraform-aws-rds-module % git status
+On branch DCS-185435
+Your branch is up to date with 'origin/DCS-185435'.
+
+nothing to commit, working tree clean
+
+--------------------------INTRODUCTION--------------------
+
+    1.  Create a folder in which you want to work. 
+# If you directly try to run a git command, you will get error -
+    xyz@xyz-M-32UH ~ % git checkout -b branch1
+                               fatal: not a git repository (or any of the parent directories): .git
+
+    2.  Initiliase git in your local repo where you inted to write the code. - git init
+	3.	commit the code
+	4.	Create a local branch ,  push the code to this local branch
+	5.	raise a pull request to merge it with master.
+	6.	after approve get it merget to master branch
+
+
+
+# Q  What will happen if u push from local master to remote branch?
+
+If i push from my local master branch to remote brach, the code will be pushed to corresponding remote brach on github repo.
+For eg if u use command - git push origin master, it will push your local "master" branch to remote repo, which is "origin" and code will be updated in master branch on remote github repo. **Not recommended**
+
+# Q Should i create a new local branch first? or should i work on master branch only?
+
+It is generally a good practice to create a local branch for each new feature or bug fix you are working on. This allows you to isolate your changes, colllaborate with others and easily switch btw diff tasks. You can work on your local branch and then merge it into the master branch when your changes are ready. Working directly on the local master branch is discouraged bcoz it can lead to conflicts and difficulties in manageing concurrent tasks.
+
+# Q - If i have to push from my local branch to a remote branch, what steps I have to do?
+
+to push changes from local branch to remote branch, here are the steps -
+
+1. Switch to your local branch first - use **git checkout <branch-name>** to switch to branch where u want to make changes
+2. Make changes
+3. Stage changes - **git add**  - It allows you to select which changes u want to include in your commit.
+4. Commit your changes - use **git commit -m "my changes"** to commit your changes locally.
+5. Fetch the latest changes - before pushing, its good practice to fetch the latest changes from remote repo to make sure your local branch is up to date. Use **git fetch** for this.
+3. Push to Remote - Use the **git push <remote-repo-name> <local-branch-name>:<remote-branch-name>** command to push your changes to remote branch.  Eg - git push origin feature:feature - origin is remote repo which u want to push to, feature is local and remote  branch name
+
+4. Enter credentials if asked
+5. Verify on Remote - After push is success, go to remote repo to verify your changes have been pushed to remote branch.
+
+# Can i push changes from my local master branch to remote branch?
+
+Ans -  Avoid making direct changes to master branch. Work on feature branches for better code organisation and collobration
+Yes u can push changes to a remote branch(feature), **however be cautious**, especially if u are working on master branch directly.
+for pushing from master - git checkout master
+                          git add .
+                          git commit -m "Msg"
+                          git push origin master:feature
+
+# Do i have to create a remote branch first in order to push to from a local branch?
+
+Ans - In GIT , you can push changes to a remote branch even if the remote branch doesn't exist yet. When u push changes form a local branch that doesnt exist on the remote repo, **GIT will create the remote branch for you.** so its not necessary to manually create a remote branch before pushing.
+
+Suppose you have a local branch named - my-branch, and u push it to origin repo
+If you run --> **git push origin my-branch**, git will check if remote branch "my-branch" exists. If it doesnt exist on the remote repo, GIT will create it and push your local branchs commit to that newly create remote branch.
+
+# Commands
+
+1. git checkout <branch name>  - Switch back and forth between branches using .
+2. git branch new_branch - Create a new branch
+3. git checkout -b NEW_BRANCH_NAME - Create a new branch and simulataneously switch to it.
+4. git push -u origin <branch> - set up the tracking information during the push (How do I push a new local branch to a remote Git repository and track it too?)
+
+
+# How do I create a remote Git branch?
+
+https://stackoverflow.com/questions/1519006/how-do-i-create-a-remote-git-branch
+
+# How to use visual stuido code wit git
+
+
+db-workspace ,provider.tf u dont have to push as it already exist in workspace repo.
+
+also update the source in your workspace repo
+
+you have to clone the workspace repo and then update that rdstest file with your source code, and push that PR to workspace rds
+it needs approval and ONCE IT is approved, the TFE will run your terraform code
+
+go through other PR that pratiksha have shared and see how they are working
+
+only push that files to remote that u have made changes in, dont push whole repo
+
+
+
+# Q - I had created a local branch and pushed it to remote repo. Then i made some changes in remote repo, and now i have made some changes again in my code. I am trying to push to my remote branch but it is giving me error - updates were rejected because the remote contains work that you do not have locally. But i dont want to do git pull and merge changes which i made in remote repo to my local. What should i do?
+
+Ans - If you want to push your local changes to the remote branch without merging the remote changes into your local branch, you can force push your changes. 
+
+However, please be cautious when using the force push option, as it can potentially overwrite changes on the remote branch. 
+Here's how you can force push your changes: 
+
+1. First, ensure that your local branch is up to date with the latest changes from the remote repository. You can do this by running: ```bash git fetch origin ``` 
+2. Then, rebase your local changes on top of the remote branch. This replays your local commits on top of the remote branch's latest state: ```bash git rebase origin/your-branch-name ``` 
+3. Resolve any merge conflicts if they occur during the rebase process. 
+4. Once the rebase is complete and your local branch is up to date, force push your changes to the remote branch: ```bash git push -f origin your-branch-name ``` 
+
+Be cautious when using force push, especially on shared branches, as it can lead to data loss if not used carefully. Make sure you communicate with your team if you decide to force push to ensure everyone is aware of the changes.
+
+
+# Q So if its dangerous, can i create another branch and push that branch to remote repo? That way my old remote branch will also not override and there would be no data loss
+
+
+Creating a new branch and pushing it to the remote repository is a safer approach if you want to avoid overwriting the existing remote branch and potentially causing data loss. Here are the steps to do that: 
+1. Create a new local branch from your current branch, which contains your latest changes: ```bash git checkout -b new-branch-name ``` 
+2. Push the new branch to the remote repository: ```bash git push origin new-branch-name ``` By doing this, you'll have a new branch with your latest changes on the remote repository, and your old branch will remain intact. This way, you can keep both branches, and there won't be any risk of data loss or overwriting the existing remote branch. Just make sure to communicate with your team and let them know about the new branch so that everyone is aware of the changes you're making.
+
+# Q Its is giving me error - src refspec does not match any Failed to push some refs to “github/remote-repo”
+
+
+The error message "src refspec does not match any" typically means that the branch you are trying to push to the remote repository does not exist locally. To resolve this issue, follow these steps: 
+
+1. Ensure you are on the correct branch where you've made your changes. You can check your current branch using: ```bash git branch ``` 
+2. Double-check the name of the new branch you want to create and push. Make sure it's spelled correctly. 
+3. If you haven't committed your changes to the current branch, commit them first: ```bash git commit -m "Your commit message" ``` 
+4. Create a new branch and switch to it: ```bash git checkout -b new-branch-name ``` Replace `new-branch-name` with the desired name for your new branch. 
+5. Now, try pushing the new branch to the remote repository again: ```bash git push origin new-branch-name ``` If you continue to encounter issues, please double-check the branch names and ensure you are working in the correct repository. Additionally, verify that your remote repository is correctly configured as "origin."
+
+
+# Q- Are git push origin and git push —set-upstream origin both the same command?
+
+
+No, `git push origin ` and `git push --set-upstream origin ` are not the same command, but they serve related purposes. 
+
+1. `git push origin `: - This command is used to push your local branch to the remote repository under the specified branch name ``. - It is typically used when you want to push your local changes to an existing remote branch. 
+
+2. `git push --set-upstream origin `: - This command is used when you want to set the upstream branch for your local branch. The upstream branch is the remote branch that your local branch should track. It is often used when you are creating a new branch locally and want to push it to the remote repository for the first time. After using this command, you can simply use `git push` without specifying the remote and branch name, and Git will automatically push to the correct remote branch that you've set as the upstream. 
+
+For example, if you create a new branch locally and want to push it to the remote repository while setting up tracking, you can use: ```bash git push --set-upstream origin ``` Afterward, you can use `git push` to push changes to and pull changes from the correct remote branch without specifying the branch name and remote every time.
+
+# Q - If does not exist on remote, will git push --set-upstream origin will create the branch and store all push there?
+
+
+Yes, if `` does not exist on the remote repository, the `git push --set-upstream origin ` command will create the branch on the remote repository and push your local branch to it. Here's how it works: 
+
+1. You create a new branch locally using: ```bash git checkout -b ``` 
+2. Then, you use the `--set-upstream` (or `-u`) option with `git push` to set the upstream and push the branch to the remote repository: ```bash git push --set-upstream origin ``` This command will create the branch `` on the remote repository (if it doesn't already exist) and set up tracking between your local branch and the remote branch. So, if the branch doesn't exist remotely, this command will effectively create it and store all your local changes there.
+
+
+# I have pushed and remote branch is now created. It is telling to compare and pull request, but i dont want to merge with master, i have pushed just for testing purpose
+
+
+If you've pushed a branch to the remote repository and you don't want to create a pull request or merge it with the `master` branch, you can simply leave it as is. Pushing the branch to the remote repository doesn't automatically merge it with `master` or any other branch. It's just a way to share your changes with others or store them remotely. You can continue working on your branch, testing, and making changes as needed without merging it into `master`. When you're ready to merge, you can initiate a pull request or merge manually if required. To summarize, pushing a branch to the remote repository doesn't trigger automatic merges; it's a separate step you can perform when you're ready to integrate your changes.
+
+
+# How can i push only that file to repo to which i have made the changes?
+
+Ans - To push only specific file, create a local branch, add the text file/ or the file in which you want to make changes to, run git add, and then commit
+       Push that branch to remote repo.
+
+xyz@xyz-M-32UH tf-workspace-rds-aws % git status
+On branch DCS-185435M
+nothing to commit, working tree clean
+
+we have made changes to file, now if we do git status, it will show us untracked file -->
+
+xyz@xyz-M-32UH tf-workspace-rds-aws % git status
+On branch DCS-185435M
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        environments/integration/DCSTestcheck.tf
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+git add .
+git commit -m "vault changes V1"
+[DCS-185435M cf21b74] vault changes V1
+ 1 file changed, 17 insertions(+)
+ create mode 100644 environments/integration/DCSTestcheck.tf
+
+xyz@xyz-M-32UH tf-workspace-rds-aws % git status
+On branch DCS-185435M
+nothing to commit, working tree clean
+xyz@xyz-M-32UH tf-workspace-rds-aws % git push        
+fatal: The current branch DCS-185435M has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin DCS-185435M
+
+xyz@xyz-M-32UH tf-workspace-rds-aws % git push --set-upstream origin DCS-185435M
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 743 bytes | 743.00 KiB/s, done.
+Total 5 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+remote: 
+remote: Create a pull request for 'DCS-185435M' on GitHub by visiting:
+remote:      https://sqbu-github.cisco.com/Pernce/bxxxx/pull/new/DCS-185435M
+remote: 
+To sqbu-github.cisco.com:Persistence/tf-workspace-rds-aws.git
+ * [new branch]      DCS-185435M -> DCS-185435M
+branch 'DCS-185435M' set up to track 'origin/DCS-185435M'.
+xyz@xyz-M-32UH tf-workspace-rds-aws % 
+
+Click on this link to see your PR
+
+Error: Cannot override provider configuration
+│ 
+│   on DCSTestcheck.tf line 14, in module "rdsinttest_mysql":
+│   14:        aws = aws.dev_us_east_1
+│ 
+│ The configuration of module.rdsinttest_mysql has its own local
+│ configuration for aws, and so it cannot accept an overridden configuration
+│ provided by the root module.
+
+
+remove provider.tf from your rds-db-creation and try again
+
+
+module "rdsvault1_mysqlwebex" {
+     source = "git@sqbu-github.cisco.com:Persistence/terraform-aws-rds-module.git//modules/rds-mysql/rds-db-creation?ref=mysql-DCS-185435"
+     instanceid = "rdsdev-rdstest11-nik01"               # rds_instance_name is changed to instanceid here
+     db_name = "nikmysql_aloadtest01" 
+     action = "provisionnewdb" ##"Provide action - provisionnewdb, terminatedb"
+     vault_path = "aint1"
+     name = "arn"
+     app_name = "atlas"
+     providers = {
+       aws = aws.dev_us_east_1
+     }
+}
+
+
